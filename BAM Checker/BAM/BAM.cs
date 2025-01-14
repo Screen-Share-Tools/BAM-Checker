@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using BAM_Checker;
+﻿using System.Runtime.InteropServices;
 using BAM_Checker.UI;
 using Microsoft.Win32;
 

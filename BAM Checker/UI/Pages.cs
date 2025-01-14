@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Xml.Linq;
-using System.Xml.Serialization;
-using BAM_Checker;
+﻿using System.Windows;
 
 namespace BAM_Checker.UI
 {
