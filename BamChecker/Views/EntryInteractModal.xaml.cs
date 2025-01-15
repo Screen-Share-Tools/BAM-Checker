@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using BAM_Checker.BAM;
+using BamChecker.BAM;
 
-namespace BAM_Checker.Views
+namespace BamChecker.Views
 {
     public partial class EntryInteractModal : Window
     {

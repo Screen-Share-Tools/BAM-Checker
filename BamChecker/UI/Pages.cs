@@ -1,14 +1,14 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 
-namespace BAM_Checker.UI
+namespace BamChecker.UI
 {
     internal class Pages
-    {    
-
+    {
         MainWindow mainWindow;
         List<Page> pages;
-
-        public Pages(MainWindow mainWindow) {
+        public Pages(MainWindow mainWindow)
+        {
             this.mainWindow = mainWindow;
             this.pages = new List<Page>();
         }
@@ -16,7 +16,8 @@ namespace BAM_Checker.UI
         // methods
         public void Add(string name, UIElement element)
         {
-            if (name == null || element == null ) {
+            if (name == null || element == null)
+            {
                 Error("Element not found");
                 return;
             }
@@ -35,7 +36,7 @@ namespace BAM_Checker.UI
                 return;
             }
 
-            Page page = this.pages.Find(page => page.name == name);
+            Page page = this.pages.Find(p => p.name == name);
             if (page.name == null)
             {
                 Error("Page not found.");
@@ -53,7 +54,7 @@ namespace BAM_Checker.UI
                 return;
             }
 
-            Page page = this.pages.Find(page => page.name == name);
+            Page page = this.pages.Find(p => p.name == name);
             if (page.name == null)
             {
                 Error("Page not found.");
@@ -71,7 +72,7 @@ namespace BAM_Checker.UI
                 return;
             }
 
-            Page page = this.pages.Find(page => page.name == name);
+            Page page = this.pages.Find(p => p.name == name);
             if (page.name == null)
             {
                 Error("Page not found.");
@@ -88,7 +89,6 @@ namespace BAM_Checker.UI
             Application.Current.Shutdown();
         }
     }
-
     public struct Page
     {
         public string name;
