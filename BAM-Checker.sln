@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BamChecker", "BamChecker\BamChecker.csproj", "{074B8C2F-7BBC-49F1-84DE-864B1DDE2BC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BAM-Checker", "Bam-Checker\BAM-Checker.csproj", "{074B8C2F-7BBC-49F1-84DE-864B1DDE2BC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
