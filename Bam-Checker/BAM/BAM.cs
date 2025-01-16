@@ -190,6 +190,8 @@ namespace BamChecker.BAM
         public string Local_Time { get; set; }
         public DateTime UTC_Time_Date { get; set; }
         public DateTime Local_Time_Date { get; set; }
+        public bool Is_In_Session { get; set; }
+        public string Session_Text { get; set; }
 
         public BamEntry(string name, string utc_time, string local_time, DateTime utc_time_date, DateTime local_time_date)
         {
@@ -198,6 +200,10 @@ namespace BamChecker.BAM
             this.Local_Time = local_time;
             this.UTC_Time_Date = utc_time_date;
             this.Local_Time_Date = local_time_date;
+
+            this.Is_In_Session = this.Local_Time_Date >= MainWindow.sessionDate && this.Local_Time_Date <= DateTime.Now;
+            this.Session_Text = this.Is_In_Session ? "In Session" : "Not In Session";
         }
+
     }
 }

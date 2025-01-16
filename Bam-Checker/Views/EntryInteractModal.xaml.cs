@@ -10,7 +10,6 @@ namespace BamChecker.Views
     public partial class EntryInteractModal : Window
     {
         BamEntry entry { set; get; }
-        bool isInSession = false;
 
         public EntryInteractModal(BamEntry entry)
         {
@@ -19,8 +18,7 @@ namespace BamChecker.Views
             this.entry = entry;
             this.txtInput.Text = this.entry.Name;
 
-            isInSession = entry.Local_Time_Date >= MainWindow.sessionDate && entry.Local_Time_Date <= DateTime.Now;
-            if (isInSession)
+            if (this.entry.Is_In_Session)
             {
                 sessionText.Text = "In Session";
                 sessionText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#28a745"));

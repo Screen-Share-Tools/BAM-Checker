@@ -47,6 +47,13 @@ namespace BamChecker
             this.pages.Hide("firstPage");
             this.pages.Show("secondPage");
 
+            // session date
+            if (firstCheck)
+            {
+                sessionDate = await GetSystemBootTime();
+                firstCheck = false;
+            }
+
             // parse BAM
             List<BamEntry> tempEntries = new List<BamEntry>();
             await Task.Run(() =>
@@ -57,6 +64,8 @@ namespace BamChecker
                     tempEntries.Add(entry);
                 }
             });
+
+
             foreach (var entry in tempEntries)
             {
                 this.BamEntries.Add(entry);
@@ -67,13 +76,6 @@ namespace BamChecker
             collectionView.SortDescriptions.Clear();
             collectionView.SortDescriptions.Add(new SortDescription("UTC_Time", ListSortDirection.Descending));
             this.timeCol.SortDirection = ListSortDirection.Descending;
-
-            // session date
-            if (firstCheck)
-            {
-                sessionDate = await GetSystemBootTime();
-                firstCheck = false;
-            }
 
             this.pages.Show("thirdPage");
         }
