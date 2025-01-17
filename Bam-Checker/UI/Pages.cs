@@ -83,10 +83,10 @@ namespace BamChecker.UI
         }
 
         // err
-        public static void Error(string msg)
+        public static void Error(string msg, bool shoutdown = true)
         {
             MessageBox.Show(msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            Application.Current.Shutdown();
+            if (shoutdown) Application.Current.Shutdown();
         }
     }
     public struct Page

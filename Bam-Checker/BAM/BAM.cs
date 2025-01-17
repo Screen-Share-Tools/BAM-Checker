@@ -98,6 +98,8 @@ namespace BamChecker.BAM
                                 path = $@"{ConvertHardDiskVolumeToLetter(value)}\{string.Join(@"\", pathNoLetter)}";
 
                             }
+                            else
+                                continue;
 
                             BamEntry entry = new BamEntry(path, utcTime, localTime, utcTimeDate, localTimeDate);
                             entries.Add(entry);

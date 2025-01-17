@@ -5,12 +5,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
+using System.Windows.Media.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using BamChecker.BAM;
 using BamChecker.UI;
@@ -31,6 +34,27 @@ namespace BamChecker
             // init
             InitializeComponent();
 
+            // icon
+            using (System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location))
+            {
+                try
+                {
+                    BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                    icon.Handle,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+
+                    WindowIcon.Source = bitmapSource;
+                }
+                finally
+                {
+                    DllImports.DeleteObject(icon.Handle);
+                    DllImports.DestroyIcon(icon.Handle);
+                }
+            }
+
+
+            // bam init
             this.BamEntries = new ObservableCollection<BamEntry>();
             this.DataContext = this;
 
@@ -77,6 +101,47 @@ namespace BamChecker
             collectionView.SortDescriptions.Add(new SortDescription("UTC_Time", ListSortDirection.Descending));
             this.timeCol.SortDirection = ListSortDirection.Descending;
 
+            this.pages.Hide("secondPage");
+            this.pages.Show("thirdPage");
+        }
+
+        private async void Fetch_Again_Click(object sender, RoutedEventArgs e)
+        {
+            this.BamEntries.Clear();
+
+            this.pages.Hide("thirdPage");
+            this.pages.Show("secondPage");
+
+            // session date
+            if (firstCheck)
+            {
+                sessionDate = await GetSystemBootTime();
+                firstCheck = false;
+            }
+
+            // parse BAM
+            List<BamEntry> tempEntries = new List<BamEntry>();
+            await Task.Run(() =>
+            {
+                BamEntry[] entries = BAM.BAM.getBamEntries();
+                foreach (BamEntry entry in entries)
+                {
+                    tempEntries.Add(entry);
+                }
+            });
+
+            foreach (var entry in tempEntries)
+            {
+                this.BamEntries.Add(entry);
+            }
+
+            // automatic filter
+            var collectionView = CollectionViewSource.GetDefaultView(BamEntries);
+            collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new SortDescription("UTC_Time", ListSortDirection.Descending));
+            this.timeCol.SortDirection = ListSortDirection.Descending;
+
+            this.pages.Hide("secondPage");
             this.pages.Show("thirdPage");
         }
 
@@ -93,7 +158,7 @@ namespace BamChecker
             if (entry == null) return;
 
             var entryInteractModal = new EntryInteractModal(entry);
-            entryInteractModal.ShowDialog();
+            entryInteractModal.Show();
         }
 
         private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -126,6 +191,33 @@ namespace BamChecker
                 }
             }
             return null;
+        }
+
+        // header func
+        private void MinimizeWindow(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void MaximizeWindow(object sender, RoutedEventArgs e)
+        {
+            if (this.WindowState == WindowState.Maximized)
+                this.WindowState = WindowState.Normal;
+            else
+                this.WindowState = WindowState.Maximized;
+        }
+
+        private void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void DragWindow(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
         }
 
         // static
