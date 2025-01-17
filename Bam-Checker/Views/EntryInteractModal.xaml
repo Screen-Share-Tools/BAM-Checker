@@ -155,21 +155,6 @@
                     </Grid>
                 </StackPanel>
             </StackPanel>
-            <Grid HorizontalAlignment="Center" Margin="0,250,0,0">
-                <Button Name="btnCopy" Content="Copy" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="0,0,0,0" Click="btnSubmit_Click" />
-                <Button Name="btnOpen" Content="Open" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="110,0,0,0" Click="btnSubmit_Click" />
-                <Button Name="btnSubmit" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="220,0,0,0" Click="btnSubmit_Click" />
-            </Grid>
-
-            <Grid Margin="0,300,0,0">
-                <TextBlock Text="Informations" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Medium" FontFamily="arial" Foreground="#FFF" />
-                <StackPanel Orientation="Horizontal" Margin="0,30,0,0" Width="400" HorizontalAlignment="Center" >
-                    <TextBlock VerticalAlignment="Top" Text="Loading..." Name="sessionText" FontSize="15" Margin="0,0,0,0" FontWeight="Normal" FontFamily="arial" Foreground="#FFF" />
-                    <TextBlock VerticalAlignment="Top" Text="•" FontSize="16" Margin="10,0,10,0" FontWeight="Normal" FontFamily="arial" Foreground="#FFF" />
-
-                    <TextBlock VerticalAlignment="Top" Text="Loading..." Name="pending2" FontSize="15" Margin="0,0,0,0" FontWeight="Normal" FontFamily="arial" Foreground="#FFF" />
-                </StackPanel>
-            </Grid>
         </Grid>
     </Grid>
 </Window>

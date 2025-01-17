@@ -13,12 +13,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using BamChecker.BAM;
 using BamChecker.UI;
 using BamChecker.Views;
-using System.Runtime.InteropServices;
 
 namespace BamChecker
 {
@@ -234,6 +232,150 @@ namespace BamChecker
             WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
 
+        private void BamDataGrid_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                this.Properties_Executed();
+            }
+            else if (e.Key == Key.Delete)
+            {
+                e.Handled = true;
+                this.Hide_Executed();
+            }
+        }
+
+        // context menu
+        private void PropertiesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = bamGrid.SelectedCells.Count > 0;
+        }
+
+        private void PropertiesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Properties_Executed();
+        }
+
+        private void Properties_Executed()
+        {
+            if (bamGrid.SelectedCells.Count > 0)
+            {
+                var cells = bamGrid.SelectedCells
+                    .GroupBy(cell => cell.Item)
+                    .Select(group => group.First())
+                    .ToList();
+
+                foreach (var selectedCell in cells)
+                {
+                    var rowItem = selectedCell.Item;
+
+                    var nameValue = rowItem.GetType().GetProperty("Name")?.GetValue(rowItem, null);
+                    if (string.IsNullOrEmpty((string)nameValue)) return;
+
+                    BamEntry entry = this.BamEntries.ToList().Find(x => x.Name == (string)nameValue);
+                    if (entry == null) return;
+
+                    var entryInteractModal = new EntryInteractModal(entry);
+                    entryInteractModal.Show();
+                }
+            }
+        }
+
+        private void Open_In_Explorer(object sender, RoutedEventArgs e)
+        {
+            if (bamGrid.SelectedCells.Count > 0)
+            {
+                var cells = bamGrid.SelectedCells
+                    .GroupBy(cell => cell.Item)
+                    .Select(group => group.First())
+                    .ToList();
+
+                foreach (var selectedCell in cells)
+                {
+                    var rowItem = selectedCell.Item;
+
+                    var nameValue = rowItem.GetType().GetProperty("Name")?.GetValue(rowItem, null);
+                    if (string.IsNullOrEmpty((string)nameValue)) return;
+
+                    BamEntry entry = this.BamEntries.ToList().Find(x => x.Name == (string)nameValue);
+                    if (entry == null) return;
+
+                    if (!File.Exists(entry.Name))
+                    {
+                        Pages.Error("This folder cannot be opened.", false);
+                        return;
+                    }
+
+                    Process.Start("explorer.exe", $"/select,\"{entry.Name}\"");
+                }
+            }
+        }
+
+        private void Open_File(object sender, RoutedEventArgs e)
+        {
+            if (bamGrid.SelectedCells.Count > 0)
+            {
+                var cells = bamGrid.SelectedCells
+                    .GroupBy(cell => cell.Item)
+                    .Select(group => group.First())
+                    .ToList();
+
+                foreach (var selectedCell in cells)
+                {
+                    var rowItem = selectedCell.Item;
+
+                    var nameValue = rowItem.GetType().GetProperty("Name")?.GetValue(rowItem, null);
+                    if (string.IsNullOrEmpty((string)nameValue)) return;
+
+                    BamEntry entry = this.BamEntries.ToList().Find(x => x.Name == (string)nameValue);
+                    if (entry == null) return;
+
+                    if (!File.Exists(entry.Name))
+                    {
+                        Pages.Error("This file cannot be opened.", false);
+                        return;
+                    }
+
+                    Process.Start(entry.Name);
+                }
+            }
+        }
+
+        private void HideCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = bamGrid.SelectedCells.Count > 0;
+        }
+
+        private void HideCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Hide_Executed();
+        }
+
+        private void Hide_Executed()
+        {
+            if (bamGrid.SelectedCells.Count > 0)
+            {
+                var cells = bamGrid.SelectedCells
+                    .GroupBy(cell => cell.Item)
+                    .Select(group => group.First())
+                    .ToList();
+
+                foreach (var selectedCell in cells)
+                {
+                    var rowItem = selectedCell.Item;
+
+                    var nameValue = rowItem.GetType().GetProperty("Name")?.GetValue(rowItem, null);
+                    if (string.IsNullOrEmpty((string)nameValue)) return;
+
+                    BamEntry entry = this.BamEntries.ToList().Find(x => x.Name == (string)nameValue);
+                    if (entry == null) return;
+
+                    this.BamEntries.Remove(entry);
+                }
+            }
+        }
+
         // static
         static public async Task<DateTime> GetSystemBootTime()
         {
@@ -277,5 +419,20 @@ namespace BamChecker
                 return DateTime.Now;
             }
         }
+    }
+
+    public static class CustomCommands
+    {
+        public static readonly RoutedUICommand PropertiesCommand = new RoutedUICommand(
+            "Properties",
+            "PropertiesCommand",
+            typeof(CustomCommands)
+        );
+
+        public static readonly RoutedUICommand HideCommand = new RoutedUICommand(
+            "Hide",
+            "HideCommand",
+            typeof(CustomCommands)
+        );
     }
 }

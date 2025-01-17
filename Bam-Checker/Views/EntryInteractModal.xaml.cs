@@ -29,6 +29,7 @@ namespace BamChecker.Views
 
             this.txtInput.Text = this.entry.Name;
 
+            /*
             if (this.entry.Is_In_Session)
             {
                 sessionText.Text = this.entry.Session_Text;
@@ -39,6 +40,7 @@ namespace BamChecker.Views
                 sessionText.Text = this.entry.Session_Text;
                 sessionText.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#dc3545"));
             }
+            */
 
             // if exist
             if (File.Exists(entry.Name))
