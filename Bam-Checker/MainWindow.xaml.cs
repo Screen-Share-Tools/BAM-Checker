@@ -18,6 +18,7 @@ using System.Windows.Media;
 using BamChecker.BAM;
 using BamChecker.UI;
 using BamChecker.Views;
+using System.Runtime.InteropServices;
 
 namespace BamChecker
 {
@@ -196,28 +197,41 @@ namespace BamChecker
         // header func
         private void MinimizeWindow(object sender, RoutedEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;
+            SystemCommands.MinimizeWindow(this);
         }
 
-        private void MaximizeWindow(object sender, RoutedEventArgs e)
+        private void MaximizeRestoreWindow(object sender, RoutedEventArgs e)
         {
             if (this.WindowState == WindowState.Maximized)
-                this.WindowState = WindowState.Normal;
+            {
+                SystemCommands.RestoreWindow(this);
+            }
             else
-                this.WindowState = WindowState.Maximized;
+            {
+                SystemCommands.MaximizeWindow(this);
+            }
         }
 
         private void CloseWindow(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Application.Current.Shutdown();
         }
 
-        private void DragWindow(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DragWindow(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            if (e.ClickCount == 2)
             {
-                this.DragMove();
+                ToggleWindowState();
             }
+            else
+            {
+                DragMove();
+            }
+        }
+
+        private void ToggleWindowState()
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
 
         // static

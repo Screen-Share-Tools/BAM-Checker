@@ -183,5 +183,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- ToolTip -->
+        <Style TargetType="ToolTip">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#333" />
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
     </Application.Resources>
 </Application>

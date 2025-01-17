@@ -78,8 +78,6 @@ namespace BamChecker.Views
 
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
         {
-            string inputText = txtInput.Text;
-
             this.Close();
         }
 

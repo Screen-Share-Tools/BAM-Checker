@@ -12,7 +12,6 @@
         >
     <Window.Resources>
         <SolidColorBrush x:Key="AccentBrush" Color="#303030" />
-
         <Style TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
@@ -48,7 +47,11 @@
         </Style>
     </Window.Resources>
 
-    <Border BorderBrush="#808080" BorderThickness="1">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" CornerRadius="0" GlassFrameThickness="0" ResizeBorderThickness="0" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderBrush="#808080" CornerRadius="5" BorderThickness=".5">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -57,10 +60,11 @@
 
             <!-- Header -->
             <DockPanel Grid.Row="0" Background="{StaticResource AccentBrush}" Height="35" VerticalAlignment="Top"  MouseLeftButtonDown="DragWindow">
-                <Image Name="WindowIcon" Width="15" Height="15" Margin="5,0" VerticalAlignment="Center" />
+                <Image Name="WindowIcon" Width="15" Height="15" Margin="20,0,0,0" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Title}" 
                            Foreground="White" 
                            VerticalAlignment="Center" 
+                           FontSize="12"
                            Margin="5,0" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <StackPanel.Resources>
@@ -108,9 +112,13 @@
                         </Style>
                     </StackPanel.Resources>
 
-                    <Button Content="&#xE921;" Foreground="#fff" Width="40" VerticalAlignment="Stretch" Click="MinimizeWindow" />
-                    <Button Content="&#xE922;" Foreground="#fff" Width="40" VerticalAlignment="Stretch" Click="MaximizeWindow" />
-                    <Button Content="&#xE8BB;" Foreground="#fff" Width="40" VerticalAlignment="Stretch" Click="CloseWindow" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="&#xE921;" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Minimize" Width="40" VerticalAlignment="Stretch" 
+                        Click="MinimizeWindow" />
+                        <Button Content="&#xE922;" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Maximize/Restore" Width="40" VerticalAlignment="Stretch" Click="MaximizeRestoreWindow" />
+                        <Button WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Close" Content="&#xE8BB;" Width="40" VerticalAlignment="Stretch" 
+                        Click="CloseWindow"/>
+                    </StackPanel>
                 </StackPanel>
             </DockPanel>
 
