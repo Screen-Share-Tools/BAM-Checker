@@ -18,6 +18,7 @@ using BamChecker.UI;
 using BamChecker.Views;
 using System.Windows.Threading;
 using System.Threading;
+using System.Reflection;
 
 namespace BamChecker
 {
@@ -35,6 +36,17 @@ namespace BamChecker
         {
             // init
             InitializeComponent();
+
+            // version
+            var assembly = Assembly.GetExecutingAssembly();
+            var informationalVersionAttribute = assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+
+            if (informationalVersionAttribute != null)
+            {
+                versionText.Text = $"v{informationalVersionAttribute.InformationalVersion}";
+                versionText2.Text = $"v{informationalVersionAttribute.InformationalVersion}";
+            }
 
             // icon
             using (System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location))

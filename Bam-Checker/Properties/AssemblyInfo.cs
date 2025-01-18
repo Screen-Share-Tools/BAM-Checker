@@ -19,5 +19,5 @@ using System.Windows;
 )]
 
 [assembly: AssemblyVersion("0.0.0")]
-[assembly: AssemblyFileVersion("0.4.0")]
-[assembly: AssemblyInformationalVersion("0.4.0-beta")]
+[assembly: AssemblyFileVersion("0.4.1")]
+[assembly: AssemblyInformationalVersion("0.4.1-beta")]
