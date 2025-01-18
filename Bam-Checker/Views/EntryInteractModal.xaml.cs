@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using BamChecker.BAM;
 using BamChecker.UI;
 using static BamChecker.DllImports;
@@ -65,6 +65,7 @@ namespace BamChecker.Views
                         BitmapSizeOptions.FromEmptyOptions());
 
                         FileIcon.Source = bitmapSource;
+                        WindowIcon.Source = bitmapSource;
                     }
                     finally
                     {
@@ -97,6 +98,77 @@ namespace BamChecker.Views
             }
 
             Process.Start("explorer.exe", $"/select,\"{entry.Name}\"");
+        }
+
+        // title bar func
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            if (WindowStyle != WindowStyle.None)
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, (DispatcherOperationCallback)delegate (object unused)
+                {
+                    WindowStyle = WindowStyle.None;
+                    return null;
+                }
+                , null);
+            }
+        }
+
+        void MinimizeWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            SystemCommands.MinimizeWindow(this);
+        }
+
+        void MaximizeRestoreWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            if (this.WindowState == WindowState.Maximized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+            else
+            {
+                SystemCommands.MaximizeWindow(this);
+            }
+        }
+
+        void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            this.Close();
+        }
+
+        void DragWindow(object sender, MouseButtonEventArgs e)
+        {
+            if (this.WindowState == WindowState.Maximized)
+            {
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                this.WindowState = WindowState.Normal;
+            }
+
+            if (e.ClickCount == 2)
+            {
+                ToggleWindowState();
+            }
+            else
+            {
+                DragMove();
+            }
+        }
+
+        void ToggleWindowState()
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            if (WindowState == WindowState.Maximized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+            else
+            {
+                SystemCommands.MaximizeWindow(this);
+            }
         }
     }
 }

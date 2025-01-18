@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -17,12 +16,16 @@ using System.Windows.Media;
 using BamChecker.BAM;
 using BamChecker.UI;
 using BamChecker.Views;
+using System.Windows.Threading;
+using System.Threading;
 
 namespace BamChecker
 {
     public partial class MainWindow : Window
     {
         public ObservableCollection<BamEntry> BamEntries { get; set; }
+        public List<BamEntry> allEntries { get; set; }
+
         Pages pages;
         bool firstCheck = true;
 
@@ -54,6 +57,7 @@ namespace BamChecker
 
 
             // bam init
+            this.allEntries = new List<BamEntry>();
             this.BamEntries = new ObservableCollection<BamEntry>();
             this.DataContext = this;
 
@@ -92,6 +96,7 @@ namespace BamChecker
             foreach (var entry in tempEntries)
             {
                 this.BamEntries.Add(entry);
+                this.allEntries.Add(entry);
             }
 
             // automatic filter
@@ -107,6 +112,7 @@ namespace BamChecker
         private async void Fetch_Again_Click(object sender, RoutedEventArgs e)
         {
             this.BamEntries.Clear();
+            this.allEntries.Clear();
 
             this.pages.Hide("thirdPage");
             this.pages.Show("secondPage");
@@ -132,6 +138,7 @@ namespace BamChecker
             foreach (var entry in tempEntries)
             {
                 this.BamEntries.Add(entry);
+                this.allEntries.Add(entry);
             }
 
             // automatic filter
@@ -173,7 +180,6 @@ namespace BamChecker
                 e.Handled = true;
             }
         }
-
         private ScrollViewer GetScrollViewer(DependencyObject parent)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -191,47 +197,6 @@ namespace BamChecker
             }
             return null;
         }
-
-        // header func
-        private void MinimizeWindow(object sender, RoutedEventArgs e)
-        {
-            SystemCommands.MinimizeWindow(this);
-        }
-
-        private void MaximizeRestoreWindow(object sender, RoutedEventArgs e)
-        {
-            if (this.WindowState == WindowState.Maximized)
-            {
-                SystemCommands.RestoreWindow(this);
-            }
-            else
-            {
-                SystemCommands.MaximizeWindow(this);
-            }
-        }
-
-        private void CloseWindow(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        private void DragWindow(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                ToggleWindowState();
-            }
-            else
-            {
-                DragMove();
-            }
-        }
-
-        private void ToggleWindowState()
-        {
-            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-        }
-
         private void BamDataGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -243,6 +208,71 @@ namespace BamChecker
             {
                 e.Handled = true;
                 this.Hide_Executed();
+            }
+        }
+
+        // header func
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            if (WindowStyle != WindowStyle.None)
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, (DispatcherOperationCallback)delegate (object unused)
+                {
+                    WindowStyle = WindowStyle.None;
+                    return null;
+                }
+                , null);
+            }
+        }
+
+        void MinimizeWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            SystemCommands.MinimizeWindow(this);
+        }
+
+        void MaximizeRestoreWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            if (this.WindowState == WindowState.Maximized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+            else
+            {
+                SystemCommands.MaximizeWindow(this);
+            }
+        }
+
+        void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            Application.Current.Shutdown();
+        }
+
+        void DragWindow(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ToggleWindowState();
+            }
+            else
+            {
+                DragMove();
+            }
+        }
+
+        void ToggleWindowState()
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            if (WindowState == WindowState.Maximized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+            else
+            {
+                SystemCommands.MaximizeWindow(this);
             }
         }
 
@@ -377,6 +407,7 @@ namespace BamChecker
         }
 
         // static
+        private CancellationTokenSource cancellationTokenSource;
         static public async Task<DateTime> GetSystemBootTime()
         {
             try
@@ -418,6 +449,37 @@ namespace BamChecker
                 MessageBox.Show(ex.ToString());
                 return DateTime.Now;
             }
+        }
+
+        private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancellationTokenSource.Token;
+
+            await Task.Delay(300);
+
+            if (token.IsCancellationRequested)
+                return;
+
+            string searchText = ((TextBox)sender).Text;
+            var foundEntries = this.allEntries
+                .AsParallel()
+                .Where(entry => entry.Name.ToLower().Contains(searchText.ToLower()) || entry.Session_Text.ToLower().StartsWith(searchText.ToLower()))
+                .ToArray();
+
+            Dispatcher.Invoke(() =>
+            {
+                this.BamEntries.Clear();
+                foreach (var entry in foundEntries)
+                {
+                    this.BamEntries.Add(entry);
+                }
+            });
         }
     }
 

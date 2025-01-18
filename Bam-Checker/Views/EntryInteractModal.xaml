@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:BamChecker.Views"
         mc:Ignorable="d"
         Background="#151515"
+        WindowStyle="None"
         Title="Item - Loading..." Height="575" Width="550">
     <Window.Resources>
         <Style TargetType="Button">
@@ -42,10 +43,82 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="{Binding ActualHeight,ElementName=titlebar}" CornerRadius="0" GlassFrameThickness="0" ResizeBorderThickness="0" />
+    </WindowChrome.WindowChrome>
 
-    <Grid>
-        <Grid Margin="10">
-            <StackPanel Orientation="Vertical">
+    <Border BorderBrush="#808080" CornerRadius="5" BorderThickness=".5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <DockPanel x:Name="titlebar" LastChildFill="True" Grid.Row="0" Background="{StaticResource AccentBrush}" Height="35" VerticalAlignment="Top" MouseLeftButtonDown="DragWindow">
+                <Image Name="WindowIcon" Width="15" Height="15" Margin="20,0,0,0" VerticalAlignment="Stretch" />
+                <Grid VerticalAlignment="Stretch">
+                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Title}" 
+                       Foreground="White" 
+                       VerticalAlignment="Center" 
+                       FontSize="12"
+                       Margin="5,0" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border CornerRadius="0" Height="30" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+                            <Setter Property="BorderThickness" Value="0" />
+
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#404040" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" 
+                                    From="#404040" 
+                                    To="Transparent" 
+                                    Duration="0:0:1" 
+                                    AutoReverse="True" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="&#xE921;" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Minimize" Width="40" VerticalAlignment="Stretch" Click="MinimizeWindow" />
+                        <Button Content="&#xE922;" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Maximize/Restore" Width="40" VerticalAlignment="Stretch" Click="MaximizeRestoreWindow" />
+                        <Button WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Close" Content="&#xE8BB;" Width="40" VerticalAlignment="Stretch" Click="CloseWindow"/>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+
+            <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10">
                 <StackPanel Orientation="Vertical" Margin="0,0,0,5">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
@@ -156,5 +229,5 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

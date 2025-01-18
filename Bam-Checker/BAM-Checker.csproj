@@ -79,6 +79,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="UI\Pages.cs" />
+    <Compile Include="UI\WatermarkService.cs" />
     <Compile Include="Views\EntryInteractModal.xaml.cs">
       <DependentUpon>EntryInteractModal.xaml</DependentUpon>
     </Compile>

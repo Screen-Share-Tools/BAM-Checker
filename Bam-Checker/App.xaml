@@ -4,6 +4,9 @@
              xmlns:local="clr-namespace:BamChecker"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <!-- Main -->
+        <SolidColorBrush x:Key="AccentBrush" Color="#303030" />
+
         <SolidColorBrush x:Key="StandardBorderBrush" Color="#888" />
         <SolidColorBrush x:Key="StandardBackgroundBrush" Color="Black" />
         <SolidColorBrush x:Key="HoverBorderBrush" Color="#DDD" />
@@ -142,7 +145,7 @@
                 <RepeatButton Grid.Column="3" Style="{StaticResource ScrollBarLineButton}" Width="15" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z"/>
             </Grid>
         </ControlTemplate>
-        
+
         <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>
@@ -183,7 +186,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!-- ToolTip -->
         <Style TargetType="ToolTip">
             <Setter Property="Foreground" Value="White" />
