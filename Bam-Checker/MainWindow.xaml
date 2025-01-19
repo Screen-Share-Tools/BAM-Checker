@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BamChecker" xmlns:controls="clr-namespace:BamChecker.UI"
         mc:Ignorable="d"
-        Title="Bam Checker" Height="600" Width="800"
+        Title="Bam Checker" Height="650" Width="850"
         Background="#151515"
         WindowStyle="None"
         >
     <!-- Resources -->
     <Window.Resources>
+        <!-- Button -->
         <Style TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
@@ -43,6 +44,49 @@
                     </Trigger.EnterActions>
                 </Trigger>
             </Style.Triggers>
+        </Style>
+        
+        <!-- Checkbox -->
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="DimGray"/>
+            <Setter Property="Foreground" Value="DimGray"/>
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" >
+                            <Border Cursor="Hand" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" Width="25" Height="25">
+                                <Grid>
+                                    <Grid Background="{TemplateBinding Foreground}" Margin="1" Visibility="Collapsed" Name="nullBlock"/>
+                                    <Path Stretch="Uniform" Width="20" Height="15" Fill="{TemplateBinding Foreground}" Name="eliCheck" Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z " Visibility="Collapsed"/>
+                                </Grid>
+                            </Border>
+                            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="16" Text="{TemplateBinding Content}"></TextBlock>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#202020" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#202020" />
+                                <Setter Property="Foreground" Value="Gray" />
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter TargetName="eliCheck" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="eliCheck" Property="Visibility" Value="Visible"></Setter>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter TargetName="nullBlock" Property="Visibility" Value="Visible"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- Context Menu -->
@@ -284,8 +328,10 @@
                                     </TextBox>
                                 </AdornerDecorator>
 
-                                <Grid Grid.Column="2" Margin="5,0,0,0">
-                                </Grid>
+                                <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="5,0,0,0">
+                                    <CheckBox ToolTip="Show hidden flags" Margin="0,0,5,0" Content="Hidden Flags" Checked="CheckBox_Checked_Hidden_Flags" Unchecked="CheckBox_Checked_Hidden_Flags" />
+                                    <CheckBox ToolTip="Show only in session flags" Margin="5,0,5,0" Content="Session Flags" Checked="CheckBox_Checked_Session_Flags" Unchecked="CheckBox_Checked_Session_Flags" />
+                                </StackPanel>
                             </Grid>
 
                             <DataGrid
@@ -317,6 +363,31 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn x:Name="timeCol" Header="Local Time" Binding="{Binding Local_Time}" Width="Auto" />
                                     <DataGridTextColumn x:Name="nameCol" Header="Name" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTemplateColumn Header="Signature" Width="Auto" SortMemberPath="Signature" ClipboardContentBinding="{Binding Signature}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Signature}" HorizontalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding Signature}" Value="Signed" />
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <MultiDataTrigger.Setters>
+                                                                        <Setter Property="Foreground" Value="#28a745" />
+                                                                    </MultiDataTrigger.Setters>
+                                                                </MultiDataTrigger>
+                                                            </Style.Triggers>
+                                                            <Style.Setters>
+                                                                <Setter Property="Foreground" Value="#dc3545" />
+                                                            </Style.Setters>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="Is_In_Session" ClipboardContentBinding="{Binding Session_Text}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>

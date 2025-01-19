@@ -25,12 +25,14 @@ namespace BamChecker
     public partial class MainWindow : Window
     {
         public ObservableCollection<BamEntry> BamEntries { get; set; }
-        public List<BamEntry> allEntries { get; set; }
+        public List<BamEntry> AllEntries { get; set; }
 
         Pages pages;
-        bool firstCheck = true;
 
         public static DateTime sessionDate = DateTime.Now;
+
+        // filters
+        bool hidden_flags, only_session = false;
 
         public MainWindow()
         {
@@ -67,9 +69,8 @@ namespace BamChecker
                 }
             }
 
-
             // bam init
-            this.allEntries = new List<BamEntry>();
+            this.AllEntries = new List<BamEntry>();
             this.BamEntries = new ObservableCollection<BamEntry>();
             this.DataContext = this;
 
@@ -87,28 +88,24 @@ namespace BamChecker
             this.pages.Show("secondPage");
 
             // session date
-            if (firstCheck)
-            {
-                sessionDate = await GetSystemBootTime();
-                firstCheck = false;
-            }
+            sessionDate = await GetSystemBootTime();
 
             // parse BAM
             List<BamEntry> tempEntries = new List<BamEntry>();
             await Task.Run(() =>
             {
                 BamEntry[] entries = BAM.BAM.getBamEntries();
+
                 foreach (BamEntry entry in entries)
                 {
                     tempEntries.Add(entry);
                 }
             });
 
-
             foreach (var entry in tempEntries)
             {
-                this.BamEntries.Add(entry);
-                this.allEntries.Add(entry);
+                if (BAM.BAM.CheckIfFile(entry.BAM_Path)) this.BamEntries.Add(entry);
+                this.AllEntries.Add(entry);
             }
 
             // automatic filter
@@ -124,17 +121,14 @@ namespace BamChecker
         private async void Fetch_Again_Click(object sender, RoutedEventArgs e)
         {
             this.BamEntries.Clear();
-            this.allEntries.Clear();
+            this.BamEntries.Clear();
+            this.AllEntries.Clear();
 
             this.pages.Hide("thirdPage");
             this.pages.Show("secondPage");
 
             // session date
-            if (firstCheck)
-            {
-                sessionDate = await GetSystemBootTime();
-                firstCheck = false;
-            }
+            sessionDate = await GetSystemBootTime();
 
             // parse BAM
             List<BamEntry> tempEntries = new List<BamEntry>();
@@ -150,7 +144,22 @@ namespace BamChecker
             foreach (var entry in tempEntries)
             {
                 this.BamEntries.Add(entry);
-                this.allEntries.Add(entry);
+                this.AllEntries.Add(entry);
+            }
+
+            string searchTextLower = SearchTextBox.Text.ToLower();
+            var filteringEntries = this.AllEntries
+                .Where(entry =>
+                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
+                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
+                    (!this.only_session || entry.Is_In_Session)
+                )
+                .ToList();
+
+            this.BamEntries.Clear();
+            foreach (var entry in filteringEntries)
+            {
+                this.BamEntries.Add(entry);
             }
 
             // automatic filter
@@ -192,6 +201,7 @@ namespace BamChecker
                 e.Handled = true;
             }
         }
+
         private ScrollViewer GetScrollViewer(DependencyObject parent)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -209,6 +219,7 @@ namespace BamChecker
             }
             return null;
         }
+
         private void BamDataGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -220,6 +231,98 @@ namespace BamChecker
             {
                 e.Handled = true;
                 this.Hide_Executed();
+            }
+        }
+
+        private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancellationTokenSource.Token;
+
+            await Task.Delay(300);
+
+            if (token.IsCancellationRequested)
+                return;
+
+            string searchTextLower = SearchTextBox.Text.ToLower();
+            var filteringEntries = this.AllEntries
+                .Where(entry =>
+                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
+                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
+                    (!this.only_session || entry.Is_In_Session)
+                )
+                .ToList();
+
+            this.BamEntries.Clear();
+            Dispatcher.Invoke(() =>
+            {
+                this.BamEntries.Clear();
+                foreach (var entry in filteringEntries)
+                {
+                    this.BamEntries.Add(entry);
+                }
+            });
+        }
+
+        private void CheckBox_Checked_Hidden_Flags(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkbox = sender as CheckBox;
+            
+            if (checkbox.IsChecked == true)
+            {
+                this.hidden_flags = true;
+            }
+            else
+            {
+                this.hidden_flags = false;
+            }
+
+            string searchTextLower = SearchTextBox.Text.ToLower();
+            var filteringEntries = this.AllEntries
+                .Where(entry =>
+                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
+                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
+                    (!this.only_session || entry.Is_In_Session)
+                )
+                .ToList();
+
+            this.BamEntries.Clear();
+            foreach (var entry in filteringEntries)
+            {
+                this.BamEntries.Add(entry);
+            }
+        }
+        private void CheckBox_Checked_Session_Flags(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkbox = sender as CheckBox;
+
+            if (checkbox.IsChecked == true)
+            {
+                this.only_session = true;
+            }
+            else
+            {
+                this.only_session = false;
+            }
+
+            string searchTextLower = SearchTextBox.Text.ToLower();
+            var filteringEntries = this.AllEntries
+                .Where(entry =>
+                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
+                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
+                    (!this.only_session || entry.Is_In_Session)
+                )
+                .ToList();
+
+            this.BamEntries.Clear();
+            foreach (var entry in filteringEntries)
+            {
+                this.BamEntries.Add(entry);
             }
         }
 
@@ -461,37 +564,6 @@ namespace BamChecker
                 MessageBox.Show(ex.ToString());
                 return DateTime.Now;
             }
-        }
-
-        private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-            }
-
-            cancellationTokenSource = new CancellationTokenSource();
-            CancellationToken token = cancellationTokenSource.Token;
-
-            await Task.Delay(300);
-
-            if (token.IsCancellationRequested)
-                return;
-
-            string searchText = ((TextBox)sender).Text;
-            var foundEntries = this.allEntries
-                .AsParallel()
-                .Where(entry => entry.Name.ToLower().Contains(searchText.ToLower()) || entry.Session_Text.ToLower().StartsWith(searchText.ToLower()))
-                .ToArray();
-
-            Dispatcher.Invoke(() =>
-            {
-                this.BamEntries.Clear();
-                foreach (var entry in foundEntries)
-                {
-                    this.BamEntries.Add(entry);
-                }
-            });
         }
     }
 

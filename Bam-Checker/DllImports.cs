@@ -37,7 +37,32 @@ namespace BamChecker
             uint uFlags
         );
 
+        [DllImport("wintrust.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern IntPtr CryptCATAdminAcquireContext(ref IntPtr phCatAdmin, string pgwszCachedCat, int dwFlags);
+
+        [DllImport("wintrust.dll", SetLastError = true)]
+        public static extern bool CryptCATAdminReleaseContext(IntPtr hCatAdmin, int dwFlags);
+
+        [DllImport("wintrust.dll", SetLastError = true)]
+        public static extern bool CryptCATAdminCalcHashFromFileHandle(IntPtr hFile, ref uint pdwHashSize, byte[] pbHash, uint dwFlags);
+
+        [DllImport("wintrust.dll", SetLastError = true)]
+        public static extern IntPtr CryptCATAdminEnumCatalogFromHash(IntPtr hCatAdmin, byte[] pbHash, uint dwHashSize, uint dwFlags, ref IntPtr phCatalog);
+
+        [DllImport("wintrust.dll", SetLastError = true)]
+        public static extern bool CryptCATCatalogInfoFromContext(IntPtr hCatalog, ref CATALOG_INFO catInfo, uint dwFlags);
+
+        [DllImport("wintrust.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern uint WinVerifyTrust(IntPtr hWnd, ref Guid pgActionID, ref WINTRUST_DATA pWinTrustData);
+
         // struct
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+        };
+
         [StructLayout(LayoutKind.Sequential)]
         public struct SHFILEINFO
         {
@@ -49,5 +74,75 @@ namespace BamChecker
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
             public string szTypeName;
         };
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct WINTRUST_FILE_INFO
+        {
+            public uint cbStruct;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string pcwszFilePath;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct GUID
+        {
+            public uint Data1;
+            public ushort Data2;
+            public ushort Data3;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+            public byte[] Data4;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WintrustData
+        {
+            public uint cbStruct;
+            public IntPtr pFile;
+            public uint dwUIChoice;
+            public uint fdwRevocationChecks;
+            public uint dwUnionChoice;
+            public IntPtr pCatalog;
+            public uint dwStateAction;
+            public uint dwProvFlags;
+            public uint dwUIContext;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct WintrustFileInfo
+        {
+            public uint cbStruct;
+            public string pcwszFilePath;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct CATALOG_INFO
+        {
+            public uint cbStruct;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] // MAX_PATH
+            public string wszCatalogFile;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct WINTRUST_DATA
+        {
+            public uint cbStruct;
+            public uint dwUIChoice;
+            public uint fdwRevocationChecks;
+            public uint dwUnionChoice;
+            public uint dwStateAction;
+            public WINTRUST_CATALOG_INFO pCatalog;
+            public uint dwProvFlags;  // Questo campo deve essere aggiunto come nel codice C++
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct WINTRUST_CATALOG_INFO
+        {
+            public uint cbStruct;
+            public string pcwszCatalogFilePath;
+            public byte[] pbCalculatedFileHash;
+            public uint cbCalculatedFileHash;
+            public string pcwszMemberFilePath;
+        }
     }
 }

@@ -17,7 +17,9 @@ namespace BamChecker.Views
     {
         BamEntry entry { set; get; }
         string exeName = "";
-        FileVersionInfo fileInfo = null;
+        string folderPath = "";
+        readonly FileVersionInfo fileInfo;
+
 
         public EntryInteractModal(BamEntry entry)
         {
@@ -29,27 +31,18 @@ namespace BamChecker.Views
 
             this.txtInput.Text = this.entry.Name;
 
-            /*
-            if (this.entry.Is_In_Session)
-            {
-                sessionText.Text = this.entry.Session_Text;
-                sessionText.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#28a745"));
-            }
-            else
-            {
-                sessionText.Text = this.entry.Session_Text;
-                sessionText.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#dc3545"));
-            }
-            */
+            this.folderPath = string.Join("\\", this.entry.Name.Split('\\').Take(this.entry.Name.Split('\\').Length - 1).ToArray());
+            this.folderInput.Text = this.folderPath;
 
             // if exist
             if (File.Exists(entry.Name))
             {
                 // more informations
-                FileVersionInfo fileInfo = FileVersionInfo.GetVersionInfo(entry.Name);
+                this.fileInfo = FileVersionInfo.GetVersionInfo(entry.Name);
 
-                this.versionText.Text = $"Version: {fileInfo.ProductVersion}";
-                this.moreInfoText.Text = $"{fileInfo.ProductName}, {fileInfo.CompanyName}, {fileInfo.FileDescription}, {fileInfo.LegalCopyright}";
+
+                this.versionText.Text = $"Version: {this.fileInfo.ProductVersion}";
+                this.moreInfoText.Text = $"{this.fileInfo.ProductName}, {this.fileInfo.CompanyName}, {this.fileInfo.FileDescription}, {this.fileInfo.LegalCopyright}";
 
                 // icon
                 SHFILEINFO shinfo = new SHFILEINFO();
@@ -79,17 +72,7 @@ namespace BamChecker.Views
             this.Title = $"{this.exeName} - {this.entry.Session_Text}";
         }
 
-        private void btnSubmit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Open_File_Click(object sender, RoutedEventArgs e)
         {
             if (!File.Exists(this.entry.Name))
             {
@@ -98,6 +81,17 @@ namespace BamChecker.Views
             }
 
             Process.Start("explorer.exe", $"/select,\"{entry.Name}\"");
+        }
+
+        private void Open_Folder_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Directory.Exists(this.folderPath))
+            {
+                Pages.Error("This folder cannot be opened.", false);
+                return;
+            }
+
+            Process.Start("explorer.exe", this.folderPath);
         }
 
         // title bar func
