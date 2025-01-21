@@ -6,6 +6,8 @@
     <Application.Resources>
         <!-- Main -->
         <SolidColorBrush x:Key="AccentBrush" Color="#303030" />
+        <SolidColorBrush x:Key="ErrBrush" Color="#dc3545" />
+        <SolidColorBrush x:Key="SuccessBrush" Color="#28a745" />
 
         <SolidColorBrush x:Key="StandardBorderBrush" Color="#888" />
         <SolidColorBrush x:Key="StandardBackgroundBrush" Color="Black" />

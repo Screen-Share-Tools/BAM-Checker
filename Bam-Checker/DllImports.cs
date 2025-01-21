@@ -55,6 +55,18 @@ namespace BamChecker
         [DllImport("wintrust.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern uint WinVerifyTrust(IntPtr hWnd, ref Guid pgActionID, ref WINTRUST_DATA pWinTrustData);
 
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        public static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, int dwFlags);
+
+        [DllImport("dbghelp.dll")]
+        public static extern IntPtr ImageNtHeader(IntPtr module);
+
+        [DllImport("dbghelp.dll")]
+        public static extern IntPtr ImageDirectoryEntryToData(IntPtr baseAddress, [MarshalAs(UnmanagedType.Bool)] bool mappedAsImage, int directoryEntry, out uint size);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
         // struct
         [StructLayout(LayoutKind.Sequential)]
         public struct FILETIME
@@ -143,6 +155,16 @@ namespace BamChecker
             public byte[] pbCalculatedFileHash;
             public uint cbCalculatedFileHash;
             public string pcwszMemberFilePath;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct IMAGE_IMPORT_DESCRIPTOR
+        {
+            public uint OriginalFirstThunk;
+            public uint TimeDateStamp;
+            public uint ForwarderChain;
+            public uint Name;
+            public uint FirstThunk;
         }
     }
 }

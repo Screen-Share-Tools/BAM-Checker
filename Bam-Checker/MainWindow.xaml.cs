@@ -24,6 +24,8 @@ namespace BamChecker
 {
     public partial class MainWindow : Window
     {
+        private CancellationTokenSource cancellationTokenSource;
+
         public ObservableCollection<BamEntry> BamEntries { get; set; }
         public List<BamEntry> AllEntries { get; set; }
 
@@ -104,7 +106,7 @@ namespace BamChecker
 
             foreach (var entry in tempEntries)
             {
-                if (BAM.BAM.CheckIfFile(entry.BAM_Path)) this.BamEntries.Add(entry);
+                if (!entry.Is_Hidden) this.BamEntries.Add(entry);
                 this.AllEntries.Add(entry);
             }
 
@@ -147,20 +149,7 @@ namespace BamChecker
                 this.AllEntries.Add(entry);
             }
 
-            string searchTextLower = SearchTextBox.Text.ToLower();
-            var filteringEntries = this.AllEntries
-                .Where(entry =>
-                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
-                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
-                    (!this.only_session || entry.Is_In_Session)
-                )
-                .ToList();
-
-            this.BamEntries.Clear();
-            foreach (var entry in filteringEntries)
-            {
-                this.BamEntries.Add(entry);
-            }
+            SearchBAMEntries();
 
             // automatic filter
             var collectionView = CollectionViewSource.GetDefaultView(BamEntries);
@@ -174,6 +163,8 @@ namespace BamChecker
 
         private void DataGridCell_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
+
             var dataGridCellTarget = (DataGridCell)sender;
             var row = DataGridRow.GetRowContainingElement(dataGridCellTarget);
             if (row == null) return;
@@ -249,53 +240,15 @@ namespace BamChecker
             if (token.IsCancellationRequested)
                 return;
 
-            string searchTextLower = SearchTextBox.Text.ToLower();
-            var filteringEntries = this.AllEntries
-                .Where(entry =>
-                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
-                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
-                    (!this.only_session || entry.Is_In_Session)
-                )
-                .ToList();
-
-            this.BamEntries.Clear();
-            Dispatcher.Invoke(() =>
-            {
-                this.BamEntries.Clear();
-                foreach (var entry in filteringEntries)
-                {
-                    this.BamEntries.Add(entry);
-                }
-            });
+            SearchBAMEntries();
         }
 
         private void CheckBox_Checked_Hidden_Flags(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;
-            
-            if (checkbox.IsChecked == true)
-            {
-                this.hidden_flags = true;
-            }
-            else
-            {
-                this.hidden_flags = false;
-            }
+            this.hidden_flags = checkbox.IsChecked == true;
 
-            string searchTextLower = SearchTextBox.Text.ToLower();
-            var filteringEntries = this.AllEntries
-                .Where(entry =>
-                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
-                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
-                    (!this.only_session || entry.Is_In_Session)
-                )
-                .ToList();
-
-            this.BamEntries.Clear();
-            foreach (var entry in filteringEntries)
-            {
-                this.BamEntries.Add(entry);
-            }
+            SearchBAMEntries();
         }
         private void CheckBox_Checked_Session_Flags(object sender, RoutedEventArgs e)
         {
@@ -310,20 +263,7 @@ namespace BamChecker
                 this.only_session = false;
             }
 
-            string searchTextLower = SearchTextBox.Text.ToLower();
-            var filteringEntries = this.AllEntries
-                .Where(entry =>
-                    (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
-                    (this.hidden_flags || BAM.BAM.CheckIfFile(entry.BAM_Path)) &&
-                    (!this.only_session || entry.Is_In_Session)
-                )
-                .ToList();
-
-            this.BamEntries.Clear();
-            foreach (var entry in filteringEntries)
-            {
-                this.BamEntries.Add(entry);
-            }
+            SearchBAMEntries();
         }
 
         // header func
@@ -517,12 +457,16 @@ namespace BamChecker
                     if (entry == null) return;
 
                     this.BamEntries.Remove(entry);
+                    this.AllEntries.Remove(entry);
+                    entry.Is_Hidden = true;
+
+                    if (this.hidden_flags) this.BamEntries.Add(entry);
+                    this.AllEntries.Add(entry);
                 }
             }
         }
 
         // static
-        private CancellationTokenSource cancellationTokenSource;
         static public async Task<DateTime> GetSystemBootTime()
         {
             try
@@ -561,8 +505,36 @@ namespace BamChecker
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                Pages.Error(ex.ToString());
                 return DateTime.Now;
+            }
+        }
+
+        public void SearchBAMEntries()
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    string searchTextLower = SearchTextBox.Text.ToLower();
+                    var filteringEntries = this.AllEntries
+                        .Where(entry =>
+                            (entry.Name.ToLower().Contains(searchTextLower) || entry.Session_Text.ToLower().StartsWith(searchTextLower)) &&
+                                (this.hidden_flags || !entry.Is_Hidden) &&
+                                (!this.only_session || entry.Is_In_Session)
+                            )
+                        .ToList();
+
+                    this.BamEntries.Clear();
+                    foreach (var entry in filteringEntries)
+                    {
+                        this.BamEntries.Add(entry);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Pages.Error(ex.ToString());
             }
         }
     }

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Bam Checker" Height="650" Width="850"
         Background="#151515"
-        WindowStyle="None"
+        WindowStyle="SingleBorderWindow"
         >
     <!-- Resources -->
     <Window.Resources>
@@ -375,12 +375,12 @@
                                                                         <Condition Binding="{Binding Signature}" Value="Signed" />
                                                                     </MultiDataTrigger.Conditions>
                                                                     <MultiDataTrigger.Setters>
-                                                                        <Setter Property="Foreground" Value="#28a745" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                                     </MultiDataTrigger.Setters>
                                                                 </MultiDataTrigger>
                                                             </Style.Triggers>
                                                             <Style.Setters>
-                                                                <Setter Property="Foreground" Value="#dc3545" />
+                                                                <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
                                                             </Style.Setters>
                                                         </Style>
                                                     </TextBlock.Style>
@@ -397,14 +397,22 @@
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding Is_In_Session}" Value="True">
                                                                     <DataTrigger.Setters>
-                                                                        <Setter Property="Foreground" Value="#28a745" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                                     </DataTrigger.Setters>
                                                                 </DataTrigger>
 
                                                                 <DataTrigger Binding="{Binding Is_In_Session}" Value="False">
                                                                     <DataTrigger.Setters>
-                                                                        <Setter Property="Foreground" Value="#dc3545" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
                                                                     </DataTrigger.Setters>
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding Signature}" Value="Deleted">
+                                                                    <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding Signature}" Value="Detected">
+                                                                    <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -429,7 +437,7 @@
                                         <MenuItem FontSize="13.5" Header="Hide" Command="local:CustomCommands.HideCommand" InputGestureText="Del" />
                                     </ContextMenu>
                                 </DataGrid.ContextMenu>
-                                
+
                                 <!-- Style -->
                                 <DataGrid.Resources>
                                     <Style x:Key="ColumnHeaderGripperStyle" TargetType="{x:Type Thumb}">
@@ -526,10 +534,27 @@
                                                         <Trigger Property="IsSelected" Value="True">
                                                             <Setter TargetName="border" Property="Background" Value="#295d91" />
                                                         </Trigger>
+                                                        <Trigger Property="IsFocused" Value="True">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
                                             </Setter.Value>
                                         </Setter>
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Is_Hidden}" Value="true">
+                                                <Setter Property="Opacity" Value=".5" />
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Signature}" Value="Deleted">
+                                                <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Signature}" Value="Detected">
+                                                <Setter Property="Foreground" Value="{StaticResource ErrBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
                                 </DataGrid.CellStyle>
                             </DataGrid>

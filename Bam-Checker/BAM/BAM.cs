@@ -29,79 +29,87 @@ namespace BamChecker.BAM
                             return new BamEntry[] { };
                         }
 
-                        string[] subKeys = key.GetSubKeyNames();
-                        string bamKeyName = subKeys.OrderByDescending(k => k.Length).First();
-                        if (string.IsNullOrEmpty(bamKeyName))
-                        {
-                            Pages.Error("No sub keys found.");
-                            return new BamEntry[] { };
-                        }
-
-                        RegistryKey bamKey = key.OpenSubKey(bamKeyName);
-                        string[] values = bamKey.GetValueNames();
-
                         List<BamEntry> entries = new List<BamEntry>();
-                        foreach (string value in values)
+                        string[] subKeys = key.GetSubKeyNames().OrderByDescending(k => k.Length).ToArray();
+                        foreach (var bamKeyName in subKeys)
                         {
-                            if (string.IsNullOrEmpty(value)) continue;
-
-                            string localTime = "";
-                            string utcTime = "";
-                            DateTime localTimeDate = DateTime.Now;
-                            DateTime utcTimeDate = DateTime.Now;
-
-                            if (bamKey.GetValue(value) is byte[] binaryValue)
+                            if (string.IsNullOrEmpty(bamKeyName))
                             {
-                                try
-                                {
-                                    DllImports.FILETIME fileTime = BytesToFileTime(binaryValue);
-                                    utcTimeDate = DateTime.FromFileTimeUtc(BitConverter.ToInt64(new byte[] {
-                                    (byte)(fileTime.dwLowDateTime & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 8) & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 16) & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 24) & 0xFF),
-                                    (byte)(fileTime.dwHighDateTime & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 8) & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 16) & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 24) & 0xFF)
-                                }, 0));
-                                    localTimeDate = DateTime.FromFileTime(BitConverter.ToInt64(new byte[] {
-                                    (byte)(fileTime.dwLowDateTime & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 8) & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 16) & 0xFF),
-                                    (byte)((fileTime.dwLowDateTime >> 24) & 0xFF),
-                                    (byte)(fileTime.dwHighDateTime & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 8) & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 16) & 0xFF),
-                                    (byte)((fileTime.dwHighDateTime >> 24) & 0xFF)
-                                }, 0));
-
-                                    utcTime = $"{utcTimeDate:yyyy-MM-dd HH:mm:ss}";
-                                    localTime = $"{localTimeDate:yyyy-MM-dd HH:mm:ss}";
-                                }
-                                catch
-                                {
-                                    utcTime = "";
-                                    localTime = "";
-                                    localTimeDate = DateTime.Now;
-                                    utcTimeDate = DateTime.Now;
-                                }
+                                Pages.Error("No sub keys found.");
+                                return new BamEntry[] { };
                             }
 
-                            string path = value;
+                            RegistryKey bamKey = key.OpenSubKey(bamKeyName);
+                            string[] values = bamKey.GetValueNames();
 
-                            if (path.StartsWith(@"\Device\"))
+                            foreach (string value in values)
                             {
-                                string[] pathNoLetterFull = value.Split('\\').Where(s => !string.IsNullOrEmpty(s)).ToArray();
-                                string[] pathNoLetter = new string[pathNoLetterFull.Length - 2];
-                                Array.Copy(pathNoLetterFull, 2, pathNoLetter, 0, pathNoLetter.Length);
+                                if (string.IsNullOrEmpty(value)) continue;
 
-                                path = $@"{ConvertHardDiskVolumeToLetter(value)}\{string.Join(@"\", pathNoLetter)}";
+                                string localTime = "";
+                                string utcTime = "";
+                                DateTime localTimeDate = DateTime.Now;
+                                DateTime utcTimeDate = DateTime.Now;
 
+                                if (bamKey.GetValue(value) is byte[] binaryValue)
+                                {
+                                    try
+                                    {
+                                        DllImports.FILETIME fileTime = BytesToFileTime(binaryValue);
+                                        utcTimeDate = DateTime.FromFileTimeUtc(BitConverter.ToInt64(new byte[] {
+                                        (byte)(fileTime.dwLowDateTime & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 8) & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 16) & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 24) & 0xFF),
+                                        (byte)(fileTime.dwHighDateTime & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 8) & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 16) & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 24) & 0xFF)
+                                    }, 0));
+                                        localTimeDate = DateTime.FromFileTime(BitConverter.ToInt64(new byte[] {
+                                        (byte)(fileTime.dwLowDateTime & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 8) & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 16) & 0xFF),
+                                        (byte)((fileTime.dwLowDateTime >> 24) & 0xFF),
+                                        (byte)(fileTime.dwHighDateTime & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 8) & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 16) & 0xFF),
+                                        (byte)((fileTime.dwHighDateTime >> 24) & 0xFF)
+                                    }, 0));
+
+                                        utcTime = $"{utcTimeDate:yyyy-MM-dd HH:mm:ss}";
+                                        localTime = $"{localTimeDate:yyyy-MM-dd HH:mm:ss}";
+                                    }
+                                    catch
+                                    {
+                                        utcTime = "";
+                                        localTime = "";
+                                        localTimeDate = DateTime.Now;
+                                        utcTimeDate = DateTime.Now;
+                                    }
+                                }
+
+                                if (string.IsNullOrEmpty(localTime)) continue;
+
+                                string path = value;
+                                bool is_hidden = false;
+                                if (path.StartsWith(@"\Device\"))
+                                {
+                                    string[] pathNoLetterFull = value.Split('\\').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                                    string[] pathNoLetter = new string[pathNoLetterFull.Length - 2];
+                                    Array.Copy(pathNoLetterFull, 2, pathNoLetter, 0, pathNoLetter.Length);
+
+                                    path = $@"{ConvertHardDiskVolumeToLetter(value)}\{string.Join(@"\", pathNoLetter)}";
+                                    is_hidden = false;
+                                }
+                                else
+                                {
+                                    is_hidden = true;
+                                }
+
+                                BamEntry entry = new BamEntry(path, value, utcTime, localTime, utcTimeDate, localTimeDate, is_hidden);
+                                entries.Add(entry);
                             }
-
-                            BamEntry entry = new BamEntry(path, value, utcTime, localTime, utcTimeDate, localTimeDate);
-                            entries.Add(entry);
                         }
 
                         return entries.ToArray();
@@ -192,8 +200,10 @@ namespace BamChecker.BAM
         public bool Is_In_Session { get; set; }
         public string Session_Text { get; set; }
         public string Signature { get; set; }
+        public string Pf_File_Path { get; set; }
+        public bool Is_Hidden { get; set; }
 
-        public BamEntry(string name, string bam_path, string utc_time, string local_time, DateTime utc_time_date, DateTime local_time_date)
+        public BamEntry(string name, string bam_path, string utc_time, string local_time, DateTime utc_time_date, DateTime local_time_date, bool is_hidden)
         {
             this.Name = name;
             this.BAM_Path = bam_path;
@@ -201,11 +211,38 @@ namespace BamChecker.BAM
             this.Local_Time = local_time;
             this.UTC_Time_Date = utc_time_date;
             this.Local_Time_Date = local_time_date;
+            this.Is_Hidden = is_hidden;
 
             this.Is_In_Session = this.Local_Time_Date >= MainWindow.sessionDate && this.Local_Time_Date <= DateTime.Now;
             this.Session_Text = this.Is_In_Session ? "In Session" : "Not In Session";
 
             this.Signature = GetSignatureStatus(this.Name);
+            this.Pf_File_Path = GetPrefetchFile(this.Name);
+        }
+
+        // prefetch
+        public string GetPrefetchFile(string filePath)
+        {
+            string fileName = Path.GetFileName(filePath).ToUpper();
+            string prefetchDir = @"C:\Windows\Prefetch";
+
+            string[] foundFiles = Directory.GetFiles(prefetchDir, $"{fileName}-*.pf");
+            if (foundFiles.Length <= 0) return "No prefetch file found.";
+
+            string prefetchFile = foundFiles[0];
+            DateTime latestModificationTime = File.GetLastWriteTime(prefetchFile);
+
+            foreach (string file in foundFiles)
+            {
+                DateTime currentModificationTime = File.GetLastWriteTime(file);
+                if (currentModificationTime > latestModificationTime)
+                {
+                    prefetchFile = file;
+                    latestModificationTime = currentModificationTime;
+                }
+            }
+
+            return prefetchFile;
         }
 
         // signature
@@ -213,10 +250,12 @@ namespace BamChecker.BAM
         {
             if (!File.Exists(filePath))
             {
-                return "Deleted";
+                if (BAM.CheckIfFile(this.BAM_Path)) return "Deleted";
+                else return "";
             }
 
             X509Certificate2 cert = GetCertificateFromFile(filePath);
+
             if (cert == null)
             {
                 if (CheckCatalogSignatures(filePath)) return "Signed";
@@ -224,10 +263,11 @@ namespace BamChecker.BAM
                 return "Not signed";
             }
 
-            string subject = cert.Subject.ToLower();
-            if (subject.Contains("manthe industries, llc") || subject.Contains("slinkware"))
+            string sha1 = cert.GetCertHashString();
+            if (!string.IsNullOrEmpty(sha1))
             {
-                return "Not signed";
+                List<string> unlegitHash = new List<string>() { "5b75c311c5cb4f34f91795c58d1f8ba3bc8d12a6" };
+                if (unlegitHash.Contains(sha1)) return "Detected";
             }
 
             return "Signed";

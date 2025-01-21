@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:BamChecker.Views"
         mc:Ignorable="d"
         Background="#151515"
-        WindowStyle="None"
-        Title="Item - Loading..." Height="575" Width="550">
+        WindowStyle="SingleBorderWindow"
+        Title="Item - Loading..." Height="575" Width="450">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Template">
@@ -120,14 +120,14 @@
 
             <StackPanel Orientation="Vertical" Grid.Row="1" Margin="15">
                 <StackPanel Orientation="Vertical" Margin="0,0,0,5">
-                    <Grid HorizontalAlignment="Stretch">
+                    <Grid HorizontalAlignment="Stretch" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Image x:Name="FileIcon" Width="40" Grid.Column="0" HorizontalAlignment="Left" Height="40" Margin="10"/>
-                        <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Stretch">
+                        <Image Source="Assets/Missing_File.png" x:Name="FileIcon" Width="40" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Height="40" Margin="0,0,10,0"/>
+                        <StackPanel Orientation="Vertical" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                             <TextBlock
                                Text="More Informations:" 
                                HorizontalAlignment="Left" 
@@ -160,139 +160,543 @@
                        Foreground="#FFF" />
                 </StackPanel>
 
-                <StackPanel Margin="0,5,0,5" Orientation="Vertical">
-                    <TextBlock Grid.Column="0" 
-                       Text="Full Path:" 
-                       HorizontalAlignment="Left" 
-                       FontSize="12" 
-                       VerticalAlignment="Center" 
-                       FontWeight="Normal" 
-                       Margin="0,0,0,2.5"
-                       Foreground="#FFF" />
-                    <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" Margin="0,0,0,12.5">
+                    <StackPanel Margin="0,5,0,5" Orientation="Vertical">
+                        <TextBlock Grid.Column="0" 
+                           Text="Full Path:" 
+                           HorizontalAlignment="Left" 
+                           FontSize="12" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,0,0,2.5"
+                           Foreground="#FFF" />
+                        <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" 
-                             IsReadOnly="True" 
-                             Name="txtInput" 
-                             VerticalAlignment="Center" 
-                             Background="#202020" 
-                             Foreground="#FFF" 
-                             Margin="0,0,2,0" 
-                             TextWrapping="NoWrap" 
-                             Padding="2,4" 
-                             AcceptsReturn="False" 
-                             BorderBrush="#404040" 
-                             BorderThickness="0,0,0,1" />
+                            <TextBox Grid.Column="0" 
+                                 IsReadOnly="True" 
+                                 Name="txtInput" 
+                                 VerticalAlignment="Center" 
+                                 Background="#202020" 
+                                 Foreground="#FFF" 
+                                 Margin="0,0,2,0" 
+                                 TextWrapping="NoWrap" 
+                                 Padding="2,4" 
+                                 AcceptsReturn="False" 
+                                 BorderBrush="#404040" 
+                                 BorderThickness="0,0,0,1" />
 
-                        <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Open_File_Click" >
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="Foreground" Value="#FFF" />
-                                    <Setter Property="Background" Value="#202020"/>
-                                    <Setter Property="FontSize" Value="15" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#202020" />
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Trigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" 
-                                                    From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </Trigger.EnterActions>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <Button.Content>
-                                <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
-                            </Button.Content>
-                        </Button>
-                    </Grid>
+                            <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Copy_File_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Copy_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Grid.Column="2" Margin="2,0,0,0" Width="25" Height="25" Click="Open_File_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" 
+                                                        From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,5,0,5" Orientation="Vertical">
+                        <TextBlock Grid.Column="0" 
+                           Text="BAM Path:" 
+                           HorizontalAlignment="Left" 
+                           FontSize="12" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,0,0,2.5"
+                           Foreground="#FFF" />
+                        <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" 
+                                 IsReadOnly="True" 
+                                 Name="bamInput" 
+                                 VerticalAlignment="Center" 
+                                 Background="#202020" 
+                                 Foreground="#FFF" 
+                                 Margin="0,0,2,0" 
+                                 TextWrapping="NoWrap" 
+                                 Padding="2,4" 
+                                 AcceptsReturn="False" 
+                                 BorderBrush="#404040" 
+                                 BorderThickness="0,0,0,1" />
+
+                            <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Copy_BAM_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Copy_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Grid.Column="2" Margin="2,0,0,0" Width="25" Height="25" Click="Open_BAM_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,5,0,5" Orientation="Vertical">
+                        <TextBlock Grid.Column="0" 
+                           Text="Folder Path:" 
+                           HorizontalAlignment="Left" 
+                           FontSize="12" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,0,0,2.5"
+                           Foreground="#FFF" />
+                        <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" 
+                                 IsReadOnly="True" 
+                                 Name="folderInput" 
+                                 VerticalAlignment="Center" 
+                                 Background="#202020" 
+                                 Foreground="#FFF" 
+                                 Margin="0,0,2,0" 
+                                 TextWrapping="NoWrap" 
+                                 Padding="2,4" 
+                                 AcceptsReturn="False" 
+                                 BorderBrush="#404040" 
+                                 BorderThickness="0,0,0,1" />
+
+                            <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Copy_Folder_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Copy_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Grid.Column="2" Margin="2,0,0,0" Width="25" Height="25" Click="Open_Folder_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Margin="0,5,0,5" Orientation="Vertical">
-                    <TextBlock Grid.Column="0" 
-                       Text="Folder Path:" 
-                       HorizontalAlignment="Left" 
-                       FontSize="12" 
-                       VerticalAlignment="Center" 
-                       FontWeight="Normal" 
-                       Margin="0,0,0,2.5"
-                       Foreground="#FFF" />
-                    <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" Margin="0,12.5,0,0">
+                    <StackPanel Margin="0,5,0,5" Orientation="Vertical">
+                        <TextBlock Grid.Column="0" 
+                           Text="Prefetch File Path:" 
+                           HorizontalAlignment="Left" 
+                           FontSize="12" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,0,0,2.5"
+                           Foreground="#FFF" />
+                        <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" 
-                             IsReadOnly="True" 
-                             Name="folderInput" 
-                             VerticalAlignment="Center" 
-                             Background="#202020" 
-                             Foreground="#FFF" 
-                             Margin="0,0,2,0" 
-                             TextWrapping="NoWrap" 
-                             Padding="2,4" 
-                             AcceptsReturn="False" 
-                             BorderBrush="#404040" 
-                             BorderThickness="0,0,0,1" />
+                            <TextBox Grid.Column="0" 
+                                 IsReadOnly="True" 
+                                 Name="pfInput" 
+                                 VerticalAlignment="Center" 
+                                 Background="#202020" 
+                                 Foreground="#FFF" 
+                                 Margin="0,0,2,0" 
+                                 TextWrapping="NoWrap" 
+                                 Padding="2,4" 
+                                 AcceptsReturn="False" 
+                                 BorderBrush="#404040" 
+                                 BorderThickness="0,0,0,1" />
 
-                        <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Open_Folder_Click" >
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="Foreground" Value="#FFF" />
-                                    <Setter Property="Background" Value="#202020"/>
-                                    <Setter Property="FontSize" Value="15" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#202020" />
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Trigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </Trigger.EnterActions>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <Button.Content>
-                                <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
-                            </Button.Content>
-                        </Button>
-                    </Grid>
+                            <Button Grid.Column="1" Margin="2,0,0,0" Width="25" Height="25" Click="Copy_Prefetch_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Copy_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Grid.Column="2" Margin="2,0,0,0" Width="25" Height="25" Click="Open_Prefetch_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Folder_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                        <TextBlock Grid.Column="0" 
+                           Text="Last Modification Time:" 
+                           Name="modificationText"
+                           HorizontalAlignment="Left" 
+                           FontSize="11" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,2.5,0,0"
+                           Foreground="#FFF" />
+                    </StackPanel>
+                    <StackPanel Margin="0,5,0,5" Orientation="Vertical">
+                        <TextBlock Grid.Column="0" 
+                           Text="Executable Name:" 
+                           HorizontalAlignment="Left" 
+                           FontSize="12" 
+                           VerticalAlignment="Center" 
+                           FontWeight="Normal" 
+                           Margin="0,0,0,2.5"
+                           Foreground="#FFF" />
+                        <Grid VerticalAlignment="Top" Margin="0,2.5,0,0" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" 
+                                 IsReadOnly="True" 
+                                 Name="nameInput" 
+                                 VerticalAlignment="Center" 
+                                 Background="#202020" 
+                                 Foreground="#FFF" 
+                                 Margin="0,0,2,0" 
+                                 TextWrapping="NoWrap" 
+                                 Padding="2,4" 
+                                 AcceptsReturn="False" 
+                                 BorderBrush="#404040" 
+                                 BorderThickness="0,0,0,1" />
+
+
+                            <Button Grid.Column="1" Margin="0,0,2,0" Width="25" Height="25" Click="Copy_Name_Click" >
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Width="20" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <Image Source="Assets/Copy_Icon.png" Width="12" Height="12"/>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Grid.Column="2" Margin="5,0,0,0" Height="25" Click="Inspect_Imports_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="0.5" Height="20" Background="{TemplateBinding Background}" BorderBrush="#404040" BorderThickness="1">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="#FFF" />
+                                        <Setter Property="Background" Value="#202020"/>
+                                        <Setter Property="FontSize" Value="15" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#202020" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" From="#202020" To="#252525" Duration="0:0:0.1" AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Button.Content>
+                                    <TextBlock FontSize="12" Text="Imports" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="6" />
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>
