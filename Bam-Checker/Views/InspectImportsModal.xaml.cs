@@ -206,26 +206,18 @@ namespace BamChecker.Views
                 this.Close();
             }
 
-                if (!IsDotNetAssembly(filePath))
-                {
-                    var nativeImports = GetNativeImports(filePath);
-                    foreach (var imp in nativeImports)
-                    {
-                        foreach (var func in imp.Functions)
-                        {
-                            imports.Add(new Import(imp.LibraryName, func));
-                        }
-                    }
+            if (!IsDotNetAssembly(filePath))
+            {
+                var nativeImports = GetNativeImports(filePath);
+                return nativeImports;
+            }
+            else
+            {
+                Pages.Error(".NET executable, cannot check imports.", false);
+                this.Close();
+            }
 
-                    return imports;
-                }
-                else
-                {
-                    Pages.Error(".NET executable, cannot check imports.", false);
-                    this.Close();
-                }
-
-                return imports;
+            return imports;
         }
 
         public bool IsDotNetAssembly(string filePath)
@@ -249,7 +241,7 @@ namespace BamChecker.Views
             }
         }
 
-        public List<ImportData> GetNativeImports(string filePath)
+        public List<Import> GetNativeImports(string filePath)
         {
             IntPtr hModule = DllImports.LoadLibraryEx(filePath, IntPtr.Zero, DONT_RESOLVE_DLL_REFERENCES);
             if (hModule == IntPtr.Zero)
@@ -267,7 +259,7 @@ namespace BamChecker.Views
                 if (importDescriptor == IntPtr.Zero || size == 0)
                     throw new InvalidOperationException("Import table not found.");
 
-                var imports = new List<ImportData>();
+                var imports = new List<Import>();
                 while (true)
                 {
                     var descriptor = Marshal.PtrToStructure<DllImports.IMAGE_IMPORT_DESCRIPTOR>(importDescriptor);
@@ -277,7 +269,6 @@ namespace BamChecker.Views
                     IntPtr namePtr = new IntPtr(hModule.ToInt64() + descriptor.Name);
                     string libraryName = Marshal.PtrToStringAnsi(namePtr);
 
-                    var functions = new List<string>();
                     IntPtr thunk = new IntPtr(hModule.ToInt64() + descriptor.FirstThunk);
                     while (true)
                     {
@@ -287,16 +278,10 @@ namespace BamChecker.Views
 
                         IntPtr functionNamePtr = new IntPtr(hModule.ToInt64() + functionRva + 2);
                         string functionName = Marshal.PtrToStringAnsi(functionNamePtr);
-                        functions.Add(functionName);
+                        imports.Add(new Import(libraryName, functionName));
 
                         thunk = IntPtr.Add(thunk, IntPtr.Size);
                     }
-
-                    imports.Add(new ImportData
-                    {
-                        LibraryName = libraryName,
-                        Functions = functions
-                    });
 
                     importDescriptor += Marshal.SizeOf<DllImports.IMAGE_IMPORT_DESCRIPTOR>();
                 }
@@ -313,15 +298,15 @@ namespace BamChecker.Views
         {
             try
             {
+                string searchTextLower = SearchTextBox.Text.ToLower();
+                var filteringImports = this.AllImports
+                    .AsParallel()
+                    .Where(import =>
+                        (import.LibraryName.ToLower().Contains(searchTextLower) || import.FunctionName.ToLower().Contains(searchTextLower))
+                        )
+                    .ToList();
                 Dispatcher.Invoke(() =>
                 {
-                    string searchTextLower = SearchTextBox.Text.ToLower();
-                    var filteringImports = this.AllImports
-                        .Where(import =>
-                            (import.LibraryName.ToLower().Contains(searchTextLower) || import.FunctionName.ToLower().Contains(searchTextLower))
-                            )
-                        .ToList();
-
                     this.Imports.Clear();
                     foreach (var import in filteringImports)
                     {
