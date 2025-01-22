@@ -85,7 +85,6 @@ namespace BamChecker.Views
                 string batchFile = Path.Combine(Path.GetTempPath(), "bam_checker_updater.bat");
                 File.WriteAllText(batchFile, batchScript);
 
-                // Avvia il file batch
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = batchFile,
