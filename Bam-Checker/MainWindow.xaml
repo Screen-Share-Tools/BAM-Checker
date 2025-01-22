@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Bam Checker" Height="650" Width="850"
         Background="#151515"
+        WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
         >
     <!-- Resources -->

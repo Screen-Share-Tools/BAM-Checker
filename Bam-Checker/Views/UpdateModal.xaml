@@ -8,6 +8,7 @@
         ResizeMode="CanMinimize"
         WindowStyle="SingleBorderWindow"
         Background="#151515"
+        WindowStartupLocation="CenterScreen"
         Title="Updates Checker" Height="175" Width="375">
     <Window.Resources>
         <!-- Button -->
