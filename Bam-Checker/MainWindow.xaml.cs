@@ -19,6 +19,9 @@ using BamChecker.Views;
 using System.Windows.Threading;
 using System.Threading;
 using System.Reflection;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace BamChecker
 {
@@ -30,6 +33,7 @@ namespace BamChecker
         public List<BamEntry> AllEntries { get; set; }
 
         Pages pages;
+        AssemblyInformationalVersionAttribute informationalVersionAttribute = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
         public static DateTime sessionDate = DateTime.Now;
 
@@ -42,14 +46,10 @@ namespace BamChecker
             InitializeComponent();
 
             // version
-            var assembly = Assembly.GetExecutingAssembly();
-            var informationalVersionAttribute = assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-
-            if (informationalVersionAttribute != null)
+            if (this.informationalVersionAttribute != null)
             {
-                versionText.Text = $"v{informationalVersionAttribute.InformationalVersion}";
-                versionText2.Text = $"v{informationalVersionAttribute.InformationalVersion}";
+                versionText.Text = $"v{this.informationalVersionAttribute.InformationalVersion}";
+                versionText2.Text = $"v{this.informationalVersionAttribute.InformationalVersion}";
             }
 
             // icon
@@ -81,6 +81,9 @@ namespace BamChecker
             this.pages.Add("firstPage", this.firstPage);
             this.pages.Add("secondPage", this.secondPage);
             this.pages.Add("thirdPage", this.thirdPage);
+
+            // check updates
+            Check_Updates();
         }
 
         // actions
@@ -264,6 +267,31 @@ namespace BamChecker
             }
 
             SearchBAMEntries();
+        }
+
+        private async void Check_Updates()
+        {
+            string RepoOwner = "Screen-Share-Tools";
+            string RepoName = "BAM-Checker";
+            string apiUrl = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest";
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "BAM-App");
+
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+
+                string jsonRes = await response.Content.ReadAsStringAsync();
+
+                string latestVersion = ExtractValueFromJson(jsonRes, "tag_name");
+                string downloadUrl = ExtractValueFromJson(jsonRes, "browser_download_url");
+
+                if (string.IsNullOrEmpty(latestVersion) || string.IsNullOrEmpty(downloadUrl) || latestVersion == this.informationalVersionAttribute.InformationalVersion) return;
+
+                UpdateModal updateModal = new UpdateModal(downloadUrl, latestVersion);
+                updateModal.ShowDialog();
+            }
         }
 
         // header func
@@ -536,6 +564,18 @@ namespace BamChecker
             {
                 Pages.Error(ex.ToString());
             }
+        }
+        static string ExtractValueFromJson(string json, string key)
+        {
+            var regex = new Regex($@"""{key}"":\s*""(.*?)""", RegexOptions.IgnoreCase);
+            var match = regex.Match(json);
+
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+
+            return string.Empty;
         }
     }
 
