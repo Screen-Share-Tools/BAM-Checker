@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Threading;
 using System.Linq;
+using System.Windows.Media.Imaging;
 
 namespace BamChecker.Views
 {
@@ -31,7 +32,7 @@ namespace BamChecker.Views
         public ObservableCollection<Import> Imports { set; get; }
         public List<Import> AllImports { set; get; }
 
-        public InspectImportsModal(BamEntry entry, ImageSource icon)
+        public InspectImportsModal(BamEntry entry)
         {
             InitializeComponent();
 
@@ -41,7 +42,41 @@ namespace BamChecker.Views
 
             this.entry = entry;
             this.exeName = Path.GetFileName(this.entry.Name);
-            this.WindowIcon.Source = icon;
+
+            if (File.Exists(entry.Name))
+            {
+                // icon
+                DllImports.SHFILEINFO shinfo = new DllImports.SHFILEINFO();
+                DllImports.SHGetFileInfo(entry.Name, 0, ref shinfo, (uint)Marshal.SizeOf(shinfo), DllImports.SHGFI_ICON | DllImports.SHGFI_LARGEICON);
+
+                using (System.Drawing.Icon icon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
+                {
+                    try
+                    {
+                        BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromEmptyOptions()
+                        );
+
+                        WindowIcon.Source = bitmapSource;
+                    }
+                    finally
+                    {
+                        DllImports.DeleteObject(shinfo.hIcon);
+                        DllImports.DestroyIcon(shinfo.hIcon);
+                    }
+                }
+            }
+            else
+            {
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("pack://application:,,,/Views/Assets/Missing_File.png");
+                bitmap.EndInit();
+
+                WindowIcon.Source = bitmap;
+            }
 
             InitTable();
 
@@ -322,21 +357,20 @@ namespace BamChecker.Views
     }
 
     // classes
-    public class ImportData
-    {
-        public string LibraryName { get; set; }
-        public List<string> Functions { get; set; }
-    }
-
     public class Import
     {
         public string LibraryName { get; set; }
         public string FunctionName { get; set; }
+        public bool Unlegit {  get; set; }
 
         public Import(string lib, string func)
         {
             this.LibraryName = lib;
             this.FunctionName = func;
+
+            List<string> importsUnlegid = new List<string>() { "sendmessage", "postmessage", "mouse_event", "getkeystate", "getasynckey", "getasynckeystate", "writeprocessmemory", "regdelvalue", "pynput", "psutil", "base64", "import64" };
+            this.Unlegit = importsUnlegid.Any(import => import.ToLower().Contains(func.ToLower()) || func.ToLower().Contains(import.ToLower()));
+            this.Unlegit = string.IsNullOrEmpty(func) ? false : this.Unlegit;
         }
     }
 }

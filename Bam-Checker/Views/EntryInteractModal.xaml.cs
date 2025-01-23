@@ -156,7 +156,7 @@ namespace BamChecker.Views
 
         private void Inspect_Imports_Click(object sender, RoutedEventArgs e)
         {
-            InspectImportsModal modal = new InspectImportsModal(this.entry, WindowIcon.Source);
+            InspectImportsModal modal = new InspectImportsModal(this.entry);
             modal.Show();
         }
 
